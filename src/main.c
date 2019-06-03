@@ -1,17 +1,84 @@
-/* Contador de palavras
- *
- * Este programa recebera uma serie de caracteres representando palavras em sua
- * entrada. Ao receber um caractere fim de linha ('\n'), deve imprimir na tela o
- * numero de palavras separadas que recebeu e, apos, encerrar.
- */
-
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <pthread.h>
+#include <unistd.h>
 
-int main() {
+#define MAX_THREADS 3
+#define MAX_ELEMENTS 1024
 
-  int x, y;
+pthread_mutex_t trava;
 
-  scanf("%d %d\n", &x, &y);
-  printf("%d\n", x + 200);
-  return 0;
+int stop = 0;
+int i = 0;
+int qtde_num = 0;
+int primo = 0;
+int num_ordenados[MAX_ELEMENTS];
+
+void* ordena(void *argumento){ // Função que verifica se um determinado número é primo ou não.
+
+	int *v = (int *)argumento, x = 0, j = 0, pivo = 0, aux = 0;
+	
+	if ((qtde_num == 0 || qtde_num == 1)){
+	   stop = 1;
+	   return NULL;
+	}
+	
+	j = qtde_num - 1;
+	
+	pthread_mutex_lock(&trava); 	
+	while (num_ordenados[i] <= num_ordenados[j] && i != j)
+		j--; 
+	   if (num_ordenados[i] > num_ordenados[j]){
+		aux = num_ordenados[i];
+		num_ordenados[i] = num_ordenados[j]; //printf("teste j %d\n", j); 
+		num_ordenados[j] = aux;
+
+	   }
+	   else 
+		i++;
+		
+	if (i == qtde_num-1)
+	   stop = 1;
+
+	pthread_mutex_unlock(&trava); 
+
+ 	return NULL;
+
+}
+
+int main (){
+
+	int pos = 0, k = 0, vet_aux, indice = 0;
+	pthread_t thread[MAX_THREADS];
+
+	indice = 0;
+
+	while (scanf("%d", &num_ordenados[pos]) != (-1)){ 
+		pos++;    
+		(qtde_num)++;
+	}  
+ 
+	while (stop == 0){      
+	      if (indice < MAX_THREADS){ 	
+		 pthread_create(&(thread[indice]), NULL, ordena, (void*)num_ordenados);
+		 indice++;
+	      }	
+	      else{
+		for (indice = 0; indice < MAX_THREADS; indice++) 
+		    pthread_join(thread[indice],NULL);
+	     	indice = 0;
+	      } 
+	}
+
+	for (k = 0; k < indice; k++) 
+	     pthread_join(thread[k],NULL); 
+	
+	for (k = 0; k < qtde_num ; k++)
+	     printf("%d ", num_ordenados[k]); 
+
+	printf ("\n");
+
+	return 0;
+
 }
