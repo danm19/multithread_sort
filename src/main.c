@@ -5,7 +5,7 @@
 #include <unistd.h>
 
 #define MAX_THREADS 3
-#define MAX_ELEMENTS 1024
+#define MAX_ELEMENTS 100000000
 
 pthread_mutex_t trava;
 
@@ -49,17 +49,24 @@ void* ordena(void *argumento){ // Função que verifica se um determinado númer
 
 int main (){
 
-	int pos = 0, k = 0, vet_aux, indice = 0;
+	int pos = 0, k = 0, contador_aux, indice = 0, c;
 	pthread_t thread[MAX_THREADS];
 
 	indice = 0;
 
-	while (scanf("%d", &num_ordenados[pos]) != (-1)){ 
+	while (scanf("%c ", &c) != (-1)){ 
+		if ((c-'0') != (-4)){
+		   num_ordenados[pos] = (c-'0');
+		//printf("Valor: %d\n", num_ordenados[pos]);	
 		pos++;    
 		(qtde_num)++;
+		}	
 	}  
  
-	while (stop == 0){      
+  
+ 
+	 while (stop == 0){      
+	  
 	      if (indice < MAX_THREADS){ 	
 		 pthread_create(&(thread[indice]), NULL, ordena, (void*)num_ordenados);
 		 indice++;
@@ -74,9 +81,12 @@ int main (){
 	for (k = 0; k < indice; k++) 
 	     pthread_join(thread[k],NULL); 
 	
-	for (k = 0; k < qtde_num ; k++)
-	     printf("%d ", num_ordenados[k]); 
-
+	for (k = 0; k < qtde_num ; k++){
+	     printf("%d", num_ordenados[k]); 
+  
+	     if (k < qtde_num-1)
+		printf(" ");
+	}     
 	printf ("\n");
 
 	return 0;
