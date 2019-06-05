@@ -4,18 +4,17 @@
 #include <pthread.h>
 #include <unistd.h>
 
-#define MAX_THREADS 3
-#define MAX_ELEMENTS 100000000
+#define MAX_THREADS 3	
+#define MAX_ELEMENTS 60000
 
 pthread_mutex_t trava;
 
 int stop = 0;
 int i = 0;
 int qtde_num = 0;
-int primo = 0;
 int num_ordenados[MAX_ELEMENTS];
 
-void* ordena(void *argumento){ // Função que verifica se um determinado número é primo ou não.
+void* ordena(void *argumento){ 
 
 	int *v = (int *)argumento, x = 0, j = 0, pivo = 0, aux = 0;
 	
@@ -31,7 +30,7 @@ void* ordena(void *argumento){ // Função que verifica se um determinado númer
 		j--; 
 	   if (num_ordenados[i] > num_ordenados[j]){
 		aux = num_ordenados[i];
-		num_ordenados[i] = num_ordenados[j]; //printf("teste j %d\n", j); 
+		num_ordenados[i] = num_ordenados[j];
 		num_ordenados[j] = aux;
 
 	   }
@@ -49,36 +48,29 @@ void* ordena(void *argumento){ // Função que verifica se um determinado númer
 
 int main (){
 
-	int pos = 0, k = 0, contador_aux, indice = 0, c;
+	int k = 0, n_thread = 0;
 	pthread_t thread[MAX_THREADS];
 
-	indice = 0;
-
-	while (scanf("%c ", &c) != (-1)){ 
-		if ((c-'0') != (-4)){
-		   num_ordenados[pos] = (c-'0');
-		//printf("Valor: %d\n", num_ordenados[pos]);	
-		pos++;    
+	while (scanf("%d ", &num_ordenados[k]) != (-1)){ 	
+		k++;    
 		(qtde_num)++;
-		}	
+			
 	}  
- 
-  
  
 	 while (stop == 0){      
 	  
-	      if (indice < MAX_THREADS){ 	
-		 pthread_create(&(thread[indice]), NULL, ordena, (void*)num_ordenados);
-		 indice++;
+	      if (n_thread < MAX_THREADS){ 	
+		 pthread_create(&(thread[n_thread]), NULL, ordena, (void*)num_ordenados);
+		 n_thread++;
 	      }	
 	      else{
-		for (indice = 0; indice < MAX_THREADS; indice++) 
-		    pthread_join(thread[indice],NULL);
-	     	indice = 0;
+		for (n_thread = 0; n_thread < MAX_THREADS; n_thread++) 
+		    pthread_join(thread[n_thread],NULL);
+	     	n_thread = 0;
 	      } 
 	}
 
-	for (k = 0; k < indice; k++) 
+	for (k = 0; k < n_thread; k++) 
 	     pthread_join(thread[k],NULL); 
 	
 	for (k = 0; k < qtde_num ; k++){
@@ -88,7 +80,7 @@ int main (){
 		printf(" ");
 	}     
 	printf ("\n");
-
+	
 	return 0;
 
 }
